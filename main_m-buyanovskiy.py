@@ -10,30 +10,26 @@ import re
 
 #----------------------------------------------------------------------------------------------------
 # Заменить буквы "Ёё" на "Ее"
-def change_letters (file_name): 
+def replace_letters(file_name):
     doc = docx.Document(file_name)
-
-    #Creating an instance of a class for morphological analysis of words
     morph = pymorphy2.MorphAnalyzer()
 
     for para in doc.paragraphs:
         words = para.text.split()
         new_words = []
         for word in words:
-            # Проверием, является ли входное значение именем собственным 
             parsed_word = morph.parse(word)[0]
             if 'Name' in parsed_word.tag:
                 new_words.append(word)
             else:
-                # Заменяем буквы "Ё" на "Е" 
-                new_word = word.replace('Ё', 'е').replace('Ё', 'е') # Вызываем ещё раз так как может быть случай, когда буква "Ё" может быть заглавной
+                new_word = word.replace('Ё', 'Е').replace('ё', 'е')
                 new_words.append(new_word)
-    # Сохраняем изменённый текст в новый документ Word 
-    new_text = ' '.join(new_words)
-    new_para = doc.add_paragraph(new_text)
-    print("Все буквы Ё были исправлены")
-    return(new_para)
- 
+        para.text = ' '.join(new_words)
+
+    new_file_name = f'replaced_{file_name}'
+    doc.save(new_file_name)
+    print(f'Замена букв "Ёё" на "Ее" выполнена. Результат сохранен в файле: {new_file_name}')
+
 #----------------------------------------------------------------------------------------------------
 # Колонтитулы актуальны, год и номер в колонтитулах - актуальный
 def check_additional_part (file_name): 
@@ -150,6 +146,29 @@ def interval_font (file_name):
     # Сохраняем изменения в документе
     doc.save(file_name)
     print('Все изменения применены')
+
+# 3 Вариант решения задачи 
+# def check_font_spacing(docx_file):
+#     doc = Document(docx_file)
+#     font_spacing = None
+    
+#     for paragraph in doc.paragraphs:
+#         if font_spacing is None:
+#             font_spacing = paragraph.paragraph_format.line_spacing
+#         elif font_spacing != paragraph.paragraph_format.line_spacing:
+#             return False
+    
+#     return True
+
+# # Пример использования
+# docx_file = "example.docx"  # Укажите путь к вашему файлу .docx
+# result = check_font_spacing(docx_file)
+
+# if result:
+#     print("Интервалы шрифта во всем файле одинаковые.")
+# else:
+#     print("Интервалы шрифта во всем файле различаются.")
+
 
 #------------------------------------------------------------------------------------------------------
 # Приведение дат в единый формат 
